@@ -28,6 +28,8 @@ async def message_handler(update: Update, context: CallbackContext) -> None:
 
     save_message(message, is_edited)
 
+async def ping_handler(update: Update, context: CallbackContext) -> None:
+    await update.message.reply_text("<a href=\"tg://user?id=9644102\">🫣</a>", parse_mode=ParseMode.HTML)
 
 async def summarize_handler(update: Update, context: CallbackContext) -> None:
     """
@@ -90,6 +92,7 @@ def main():
 
     app.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND), message_handler))
     app.add_handler(CommandHandler("summarize", summarize_handler))
+    app.add_handler(CommandHandler("ping", ping_handler))
     app.add_error_handler(error_handler)
 
     app.run_polling()
