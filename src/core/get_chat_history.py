@@ -7,7 +7,7 @@ def get_chat_history(chat_id: int, from_message_id: int):
     messages = []
     file_name = f'{HISTORY_SAVE_DIRECTORY}/chat_history_{str(chat_id)}.json'
 
-    with open(file_name, 'r') as file:
+    with open(file_name, 'r', encoding="utf-8") as file:
         chat_history = json.load(file)
 
         for message in chat_history["messages"]:

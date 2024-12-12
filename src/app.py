@@ -1,12 +1,13 @@
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackContext
 from telegram import Update
+from telegram.constants import ParseMode
 from dotenv import load_dotenv
 import os
 import logging
 
 from core.get_chat_history import get_chat_history
 from core.save_message import save_message
-from core.summarize import summarize
+from core.yandex import YandexSummarize
 
 load_dotenv()
 
@@ -56,14 +57,19 @@ async def summarize_handler(update: Update, context: CallbackContext) -> None:
         logger.exception("Error while trying to retrieve the chat history.")
         return
 
-    response_message = await update.message.reply_text("Generating summary... Please wait.")
-    summary_generator = summarize(messages)
+    try:
+        source = ""
+        for message in messages:
+            source += f"{message["sender"]}: {message["message"]}\n"
 
-    for partial_response in summary_generator:
-        try:
-            await response_message.edit_text(partial_response)
-        except Exception:
-            pass
+        YANDEX_SESSION_ID = os.getenv("YANDEX_SESSION_ID")
+        ya = YandexSummarize(YANDEX_SESSION_ID)
+        summarized = await ya.generation(source)
+        await update.message.reply_text(summarized, parse_mode=ParseMode.HTML)
+    except Exception:
+        await update.message.reply_text("Something went wrong while trying to summarize the chat history.")
+        logger.exception("Error while trying to summarize the chat history.")
+        return
 
 
 def error_handler(update: Update, context: CallbackContext):

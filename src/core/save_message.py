@@ -21,7 +21,7 @@ def save_message(message: Message, is_edited: bool):
     }
 
     try:
-        with open(file_name, 'r') as file:
+        with open(file_name, 'r', encoding="utf-8") as file:
             chat_history = json.load(file)
 
             if not chat_history["chat_id"] or not chat_history["messages"]:
@@ -41,7 +41,7 @@ def save_message(message: Message, is_edited: bool):
     else:
         chat_history["messages"].append(message_data)
     
-    with open(file_name, 'w') as file:
+    with open(file_name, 'w', encoding="utf-8") as file:
         json.dump(chat_history, file, ensure_ascii=False, indent=2)
 
 
