@@ -5,7 +5,7 @@ from telegram import Message
 from config.common import HISTORY_SAVE_DIRECTORY
 
 
-def save_message(message: Message, is_edited: bool):
+def save_message(message: Message, is_edited: bool) -> None:
     chat_id = message.chat_id
     message_id = message.message_id
     sender = message.from_user.full_name

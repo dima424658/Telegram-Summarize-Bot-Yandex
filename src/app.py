@@ -5,8 +5,10 @@ from dotenv import load_dotenv
 import os
 import logging
 
+from core.emoji import get_random_emojis
 from core.get_chat_history import get_chat_history
 from core.save_message import save_message
+from core.user import save_user, get_user_history
 from core.yandex import YandexSummarize
 
 load_dotenv()
@@ -27,9 +29,21 @@ async def message_handler(update: Update, context: CallbackContext) -> None:
     message = update.edited_message if is_edited else update.message
 
     save_message(message, is_edited)
+    save_user(chat_id=message.chat_id, sender_id=message.from_user.id)
 
 async def ping_handler(update: Update, context: CallbackContext) -> None:
-    await update.message.reply_text("<a href=\"tg://user?id=9644102\">🫣</a>", parse_mode=ParseMode.HTML)
+    try:
+        users = get_user_history(update.message.chat_id)["users"]
+
+        reply = ""
+        for user_id, emoji in zip(users, get_random_emojis(len(users))):
+            reply += f'<a href="tg://user?id={user_id}">{emoji}</a>'
+
+        await update.message.reply_text(reply, parse_mode=ParseMode.HTML)
+    except Exception:
+        await update.message.reply_text("Something went wrong while trying to ping users.")
+        logger.exception("Error while trying to ping users.")
+        return
 
 async def summarize_handler(update: Update, context: CallbackContext) -> None:
     """
